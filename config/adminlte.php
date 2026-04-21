@@ -360,7 +360,7 @@ return [
     // ======================
     // ASSIGNMENTS
     // ======================
-   /*  [
+     [
         'text' => 'Assignments',
         'icon' => 'fas fa-tasks',
         'submenu' => [
@@ -372,12 +372,12 @@ return [
             ],
 
         ],
-    ], */
+    ], 
 
     // ======================
     // TIMETABLE
     // ======================
-   /*  [
+     [
         'text' => 'Timetable Management',
         'icon' => 'fas fa-calendar-alt',
         'submenu' => [
@@ -401,7 +401,7 @@ return [
             ],
 
         ],
-    ], */
+    ], 
 
     // ======================
     // ACCOUNT
