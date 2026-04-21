@@ -1,0 +1,114 @@
+/* PAGE ANIMATION */
+.content-wrapper {
+    background: #f4f6f9;
+    animation: fadePage 0.4s ease-in-out;
+}
+
+@keyframes fadePage {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* CARD DESIGN */
+.card {
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+/* BUTTONS */
+.btn {
+    border-radius: 10px;
+    font-weight: 600;
+    padding: 8px 18px;
+}
+
+.btn-primary {
+    box-shadow: 0 4px 10px rgba(0,123,255,0.2);
+}
+
+.btn-success {
+    box-shadow: 0 4px 10px rgba(40,167,69,0.2);
+}
+
+.btn-danger {
+    box-shadow: 0 4px 10px rgba(220,53,69,0.2);
+}
+
+/* TABLE */
+.table {
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+}
+
+.table thead {
+    background: #1f2937;
+    color: white;
+}
+
+.table td,
+.table th {
+    vertical-align: middle !important;
+}
+
+/* FORM */
+.form-control {
+    border-radius: 10px;
+    border: 1px solid #dcdfe6;
+    min-height: 42px;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: #4f46e5;
+}
+
+/* DASHBOARD BOX */
+.small-box {
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.small-box .icon {
+    top: 15px;
+    font-size: 60px;
+}
+
+/* SIDEBAR */
+.main-sidebar {
+    box-shadow: 4px 0 20px rgba(0,0,0,0.05);
+}
+
+.nav-sidebar .nav-link {
+    border-radius: 10px;
+    margin: 4px 8px;
+}
+
+.nav-sidebar .nav-link:hover {
+    background: rgba(255,255,255,0.08);
+}
+
+/* PAGINATION */
+.pagination .page-link {
+    border-radius: 8px;
+    margin: 0 3px;
+}
+
+/* CUSTOM PURPLE */
+.bg-purple {
+    background: #6f42c1 !important;
+    color: white !important;
+}
