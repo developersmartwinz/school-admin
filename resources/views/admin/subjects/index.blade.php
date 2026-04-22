@@ -10,88 +10,144 @@
 
 <div class="card shadow-sm">
 
-    <div class="card-header d-flex justify-content-between">
-        <h5>Subjects</h5>
+    {{-- HEADER --}}
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Subject List</h5>
 
-        		<div class="d-flex gap-2">
-    <a href="/subjects/create" class="btn btn-success">
-        <i class="fas fa-plus"></i> Add
-    </a>
+        <div class="d-flex gap-2" data-aos="flip-left">
+            <a href="/subjects/create" class="btn btn-success">
+                <i class="fas fa-plus"></i> Add
+            </a>
 
-    <button class="btn btn-danger" onclick="bulkDelete()">
-        <i class="fas fa-trash"></i> Delete
-    </button>
-</div>
+            <button
+                type="button"
+                class="btn btn-danger"
+                onclick="bulkDeleteConfirm()"
+            >
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        </div>
     </div>
 
+    {{-- BODY --}}
     <div class="card-body">
 
-        <!-- SEARCH -->
-        <form method="GET" class="mb-3 d-flex gap-2">
-            <input type="text" name="search"
-                   value="{{ request('search') }}"
-                   class="form-control"
-                   placeholder="Search subject">
+        {{-- Search --}}
+        <form
+            method="GET"
+            class="mb-3 d-flex gap-2"
+            data-aos="fade-right"
+        >
+            <input
+                type="text"
+                name="search"
+                value="{{ request('search') }}"
+                class="form-control"
+                placeholder="Search subject name"
+            >
 
             <button class="btn btn-primary">
                 <i class="fas fa-search"></i>
             </button>
         </form>
 
+        {{-- Bulk Delete Form --}}
+        <form
+            id="bulkForm"
+            method="POST"
+            action="/subjects/bulk-delete"
+        >
+            @csrf
 
-        <form id="bulkForm" method="POST" action="/subjects/bulk-delete">
-@csrf
+            <div class="table-responsive">
+                <table
+                    class="table table-bordered table-hover text-center align-middle"
+                    data-aos="zoom-in"
+                >
+                    <thead class="bg-dark text-white">
+                        <tr>
+                            <th width="50">
+                                <input type="checkbox" id="selectAll">
+                            </th>
+                            <th>ID</th>
+                            <th>Subject Name</th>
+                            <th>Class</th>
+                            <th width="150">Actions</th>
+                        </tr>
+                    </thead>
 
-<table class="table table-bordered table-hover text-center align-middle">
-    <thead class="bg-dark text-white">
-        <tr>
-            <th><input type="checkbox" id="selectAll"></th>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
+                    <tbody>
+                        @forelse($subjects as $subject)
+                            <tr>
 
-    <tbody>
-        @foreach($subjects as $subject)
-        <tr>
-            <td>
-                <input type="checkbox" name="ids[]" value="{{ $subject->id }}">
-            </td>
+                                <td>
+                                    <input
+                                        type="checkbox"
+                                        name="ids[]"
+                                        value="{{ $subject->id }}"
+                                    >
+                                </td>
 
-            <td>{{ $subject->id }}</td>
-            <td>{{ $subject->name }}</td>
+                                <td>{{ $subject->id }}</td>
 
-            <td>
-                <div class="btn-group">
-                    <a href="/subjects/edit/{{ $subject->id }}"
-                       class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-edit"></i>
-                    </a>
+                                <td>
+                                    {{ $subject->name ?? '' }}
+                                </td>
 
-                    <button type="button"
-                        class="btn btn-sm btn-outline-danger"
-                        onclick="deleteItem({{ $subject->id }})">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
+                                <td>
+                                    {{ $subject->class->name ?? '' }}
+                                </td>
 
-                <form id="delete-form-{{ $subject->id }}"
-                      method="POST"
-                      action="/subjects/delete/{{ $subject->id }}"
-                      style="display:none;">
-                    @csrf
-                    @method('DELETE')
-                </form>
-            </td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
+                                <td>
+                                    <div class="btn-group">
 
-</form>
+                                        <a
+                                            href="/subjects/edit/{{ $subject->id }}"
+                                            class="btn btn-sm btn-outline-primary"
+                                        >
+                                            <i class="fas fa-edit"></i>
+                                        </a>
 
-        {{ $subjects->links() }}
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-danger"
+                                            onclick="deleteConfirm('/subjects/delete/{{ $subject->id }}')"
+                                        >
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+
+                                    </div>
+                                </td>
+
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="text-center">
+                                    No subjects found
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+
+                </table>
+            </div>
+
+        </form>
+
+        {{-- Pagination --}}
+        <div class="mt-3">
+            {{ $subjects->links() }}
+        </div>
+
+        {{-- Hidden Single Delete Form --}}
+        <form
+            id="delete-form"
+            method="POST"
+            style="display:none;"
+        >
+            @csrf
+            @method('DELETE')
+        </form>
 
     </div>
 </div>
@@ -103,45 +159,81 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+/*
+|--------------------------------------------------------------------------
+| Select All
+|--------------------------------------------------------------------------
+*/
+document.getElementById('selectAll').addEventListener('click', function () {
+    let checkboxes = document.querySelectorAll(
+        'input[name="ids[]"]'
+    );
 
-// Select all
-document.getElementById('selectAll').onclick = function() {
-    document.querySelectorAll('input[name="ids[]"]').forEach(cb => cb.checked = this.checked);
-};
+    checkboxes.forEach((checkbox) => {
+        checkbox.checked = this.checked;
+    });
+});
 
-// Single delete
-function deleteItem(id) {
+
+/*
+|--------------------------------------------------------------------------
+| Single Delete
+|--------------------------------------------------------------------------
+*/
+function deleteConfirm(url) {
     Swal.fire({
         title: 'Delete subject?',
+        text: "This subject record will be deleted!",
         icon: 'warning',
-        showCancelButton: true
-    }).then(res => {
-        if(res.isConfirmed) {
-            document.getElementById('delete-form-'+id).submit();
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            let form = document.getElementById('delete-form');
+            form.action = url;
+            form.submit();
         }
     });
 }
 
-// Bulk delete
-function bulkDelete() {
-    let checked = document.querySelectorAll('input[name="ids[]"]:checked');
 
-    if(checked.length === 0) {
-        alert('Select at least one');
+/*
+|--------------------------------------------------------------------------
+| Bulk Delete
+|--------------------------------------------------------------------------
+*/
+function bulkDeleteConfirm() {
+    let checked = document.querySelectorAll(
+        'input[name="ids[]"]:checked'
+    );
+
+    if (checked.length === 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'No Selection',
+            text: 'Please select at least one subject.'
+        });
         return;
     }
 
     Swal.fire({
-        title: 'Delete selected?',
+        title: 'Delete selected subjects?',
+        text: "Selected subject records will be deleted!",
         icon: 'warning',
-        showCancelButton: true
-    }).then(res => {
-        if(res.isConfirmed) {
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, delete all!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
             document.getElementById('bulkForm').submit();
         }
     });
 }
-
 </script>
 
 @stop

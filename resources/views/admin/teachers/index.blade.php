@@ -10,94 +10,144 @@
 
 <div class="card shadow-sm">
 
-    <!-- HEADER -->
+    {{-- HEADER --}}
     <div class="card-header d-flex justify-content-between align-items-center">
-
         <h5 class="mb-0">Teacher List</h5>
 
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2" data-aos="flip-left">
             <a href="/teachers/create" class="btn btn-success">
                 <i class="fas fa-plus"></i> Add
             </a>
 
-            <button class="btn btn-danger" onclick="bulkDelete()">
+            <button
+                type="button"
+                class="btn btn-danger"
+                onclick="bulkDeleteConfirm()"
+            >
                 <i class="fas fa-trash"></i> Delete
             </button>
         </div>
     </div>
 
-    <!-- BODY -->
+    {{-- BODY --}}
     <div class="card-body">
 
-        <!-- SEARCH -->
-        <form method="GET" class="mb-3 d-flex gap-2">
-            <input type="text" name="search"
-                   value="{{ request('search') }}"
-                   class="form-control"
-                   placeholder="Search name or email">
+        {{-- Search --}}
+        <form
+            method="GET"
+            class="mb-3 d-flex gap-2"
+            data-aos="fade-right"
+        >
+            <input
+                type="text"
+                name="search"
+                value="{{ request('search') }}"
+                class="form-control"
+                placeholder="Search name or phone"
+            >
 
             <button class="btn btn-primary">
                 <i class="fas fa-search"></i>
             </button>
         </form>
 
-        <form id="bulkForm" method="POST" action="/teachers/bulk-delete">
+        {{-- Bulk Delete Form --}}
+        <form
+            id="bulkForm"
+            method="POST"
+            action="/teachers/bulk-delete"
+        >
             @csrf
 
-            <table class="table table-bordered table-hover text-center align-middle">
-                <thead class="bg-dark text-white">
-                    <tr>
-                        <th><input type="checkbox" id="selectAll"></th>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Subject</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @foreach($teachers as $teacher)
+            <div class="table-responsive">
+                <table
+                    class="table table-bordered table-hover text-center align-middle"
+                    data-aos="zoom-in"
+                >
+                    <thead class="bg-dark text-white">
                         <tr>
-                            <td>
-                                <input type="checkbox" name="ids[]" value="{{ $teacher->id }}">
-                            </td>
-
-                            <td>{{ $teacher->id }}</td>
-                            <td>{{ $teacher->user->name }}</td>
-                            <td>{{ $teacher->user->email }}</td>
-                            <td>{{ $teacher->subject }}</td>
-
-                            <td>
-                                <div class="btn-group">
-                                    <a href="/teachers/edit/{{ $teacher->id }}"
-                                       class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-
-                                    <button class="btn btn-sm btn-outline-danger"
-                                        onclick="deleteItem({{ $teacher->id }})">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-
-                                <form id="delete-form-{{ $teacher->id }}"
-                                      method="POST"
-                                      action="/teachers/delete/{{ $teacher->id }}"
-                                      style="display:none;">
-                                    @csrf
-                                    @method('DELETE')
-                                </form>
-                            </td>
+                            <th width="50">
+                                <input type="checkbox" id="selectAll">
+                            </th>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th width="150">Actions</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+
+                    <tbody>
+                        @forelse($teachers as $teacher)
+                            <tr>
+
+                                <td>
+                                    <input
+                                        type="checkbox"
+                                        name="ids[]"
+                                        value="{{ $teacher->id }}"
+                                    >
+                                </td>
+
+                                <td>{{ $teacher->id }}</td>
+
+                                <td>
+                                    {{ $teacher->user->name ?? '' }}
+                                </td>
+
+                                <td>
+                                    {{ $teacher->user->phone ?? '' }}
+                                </td>
+
+                                <td>
+                                    <div class="btn-group">
+
+                                        <a
+                                            href="/teachers/edit/{{ $teacher->id }}"
+                                            class="btn btn-sm btn-outline-primary"
+                                        >
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-danger"
+                                            onclick="deleteConfirm('/teachers/delete/{{ $teacher->id }}')"
+                                        >
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+
+                                    </div>
+                                </td>
+
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="text-center">
+                                    No teachers found
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+
+                </table>
+            </div>
 
         </form>
 
-        <!-- PAGINATION -->
-        {{ $teachers->links() }}
+        {{-- Pagination --}}
+        <div class="mt-3">
+            {{ $teachers->links() }}
+        </div>
+
+        {{-- Hidden Single Delete Form --}}
+        <form
+            id="delete-form"
+            method="POST"
+            style="display:none;"
+        >
+            @csrf
+            @method('DELETE')
+        </form>
 
     </div>
 </div>
@@ -109,45 +159,81 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+/*
+|--------------------------------------------------------------------------
+| Select All
+|--------------------------------------------------------------------------
+*/
+document.getElementById('selectAll').addEventListener('click', function () {
+    let checkboxes = document.querySelectorAll(
+        'input[name="ids[]"]'
+    );
 
-// Select all
-document.getElementById('selectAll').onclick = function() {
-    document.querySelectorAll('input[name="ids[]"]').forEach(cb => cb.checked = this.checked);
-};
+    checkboxes.forEach((checkbox) => {
+        checkbox.checked = this.checked;
+    });
+});
 
-// Single delete
-function deleteItem(id) {
+
+/*
+|--------------------------------------------------------------------------
+| Single Delete
+|--------------------------------------------------------------------------
+*/
+function deleteConfirm(url) {
     Swal.fire({
         title: 'Delete teacher?',
+        text: "This teacher record will be deleted!",
         icon: 'warning',
-        showCancelButton: true
-    }).then(res => {
-        if(res.isConfirmed) {
-            document.getElementById('delete-form-'+id).submit();
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            let form = document.getElementById('delete-form');
+            form.action = url;
+            form.submit();
         }
     });
 }
 
-// Bulk delete
-function bulkDelete() {
-    let checked = document.querySelectorAll('input[name="ids[]"]:checked');
 
-    if(checked.length === 0) {
-        alert('Select at least one');
+/*
+|--------------------------------------------------------------------------
+| Bulk Delete
+|--------------------------------------------------------------------------
+*/
+function bulkDeleteConfirm() {
+    let checked = document.querySelectorAll(
+        'input[name="ids[]"]:checked'
+    );
+
+    if (checked.length === 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'No Selection',
+            text: 'Please select at least one teacher.'
+        });
         return;
     }
 
     Swal.fire({
-        title: 'Delete selected?',
+        title: 'Delete selected teachers?',
+        text: "Selected teacher records will be deleted!",
         icon: 'warning',
-        showCancelButton: true
-    }).then(res => {
-        if(res.isConfirmed) {
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, delete all!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
             document.getElementById('bulkForm').submit();
         }
     });
 }
-
 </script>
 
 @stop

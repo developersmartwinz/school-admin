@@ -12,6 +12,7 @@ class FeePayment extends Model
         'paid_amount',
         'payment_mode',
         'transaction_id',
+        'student_id',
         'payment_date',
         'remarks',
         'status',

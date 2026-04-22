@@ -3,24 +3,30 @@
 @section('title', 'Student Fee Assignments')
 
 @section('content_header')
-<div class="d-flex justify-content-between align-items-center">
-    <h1>Student Fee Assignments</h1>
+    <div class="d-flex justify-content-between align-items-center">
+        <h1>Student Fee Assignments</h1>
 
-    <a href="/student-fees/create" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Assign Fees
-    </a>
-</div>
+        <a href="/student-fees/create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Assign Fees
+        </a>
+    </div>
 @stop
 
 @section('content')
 
 <div class="card shadow-sm">
+
     <div class="card-body">
 
         {{-- Filters --}}
-        <form method="GET" action="/student-fees" class="mb-4">
+        <form
+            method="GET"
+            action="/student-fees"
+            class="mb-4"
+        >
             <div class="row">
 
+                {{-- Search --}}
                 <div class="col-md-3">
                     <input
                         type="text"
@@ -31,6 +37,7 @@
                     >
                 </div>
 
+                {{-- Class Filter --}}
                 <div class="col-md-2">
                     <select name="class_id" class="form-control">
                         <option value="">All Classes</option>
@@ -46,6 +53,7 @@
                     </select>
                 </div>
 
+                {{-- Year Filter --}}
                 <div class="col-md-2">
                     <input
                         type="number"
@@ -56,14 +64,19 @@
                     >
                 </div>
 
+                {{-- Filter Button --}}
                 <div class="col-md-2">
                     <button class="btn btn-info w-100">
                         <i class="fas fa-search"></i> Filter
                     </button>
                 </div>
 
+                {{-- Reset --}}
                 <div class="col-md-2">
-                    <a href="/student-fees" class="btn btn-secondary w-100">
+                    <a
+                        href="/student-fees"
+                        class="btn btn-secondary w-100"
+                    >
                         Reset
                     </a>
                 </div>
@@ -71,17 +84,18 @@
             </div>
         </form>
 
-        {{-- Bulk Delete --}}
+        {{-- Bulk Delete Form --}}
         <form
             method="POST"
             action="/student-fees/bulk-delete"
-            onsubmit="bulkDeleteConfirm(event, this)"
+            id="bulkForm"
         >
             @csrf
 
             <button
-                type="submit"
+                type="button"
                 class="btn btn-danger mb-3"
+                onclick="bulkDeleteConfirm()"
             >
                 <i class="fas fa-trash"></i> Bulk Delete
             </button>
@@ -92,7 +106,7 @@
                     <thead>
                         <tr>
                             <th width="50">
-                                <input type="checkbox" id="select-all">
+                                <input type="checkbox" id="selectAll">
                             </th>
                             <th>#</th>
                             <th>Student</th>
@@ -149,20 +163,24 @@
                                 </td>
 
                                 <td>
-                                    <a
-                                        href="/student-fees/edit/{{ $row->id }}"
-                                        class="btn btn-sm btn-warning"
-                                    >
-                                        <i class="fas fa-edit"></i>
-                                    </a>
+                                    <div class="btn-group">
 
-                                    <button
-                                        type="button"
-                                        class="btn btn-sm btn-danger"
-                                        onclick="deleteConfirm('/student-fees/delete/{{ $row->id }}')"
-                                    >
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                        <a
+                                            href="/student-fees/edit/{{ $row->id }}"
+                                            class="btn btn-sm btn-outline-primary"
+                                        >
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-danger"
+                                            onclick="deleteConfirm('/student-fees/delete/{{ $row->id }}')"
+                                        >
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+
+                                    </div>
                                 </td>
 
                             </tr>
@@ -179,12 +197,14 @@
                 </table>
             </div>
 
-            <div class="mt-3">
-                {{ $students->appends(request()->query())->links() }}
-            </div>
         </form>
 
-        {{-- Hidden Delete Form --}}
+        {{-- Pagination --}}
+        <div class="mt-3">
+            {{ $students->appends(request()->query())->links() }}
+        </div>
+
+        {{-- Hidden Single Delete Form --}}
         <form
             id="delete-form"
             method="POST"
@@ -195,15 +215,40 @@
         </form>
 
     </div>
+
 </div>
 
 @stop
 
 @section('js')
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
+/*
+|--------------------------------------------------------------------------
+| Select All
+|--------------------------------------------------------------------------
+*/
+document.getElementById('selectAll').addEventListener('click', function () {
+    let checkboxes = document.querySelectorAll(
+        'input[name="ids[]"]'
+    );
+
+    checkboxes.forEach((checkbox) => {
+        checkbox.checked = this.checked;
+    });
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Single Delete
+|--------------------------------------------------------------------------
+*/
 function deleteConfirm(url) {
     Swal.fire({
-        title: 'Are you sure?',
+        title: 'Delete fee assignment?',
         text: "This fee assignment will be deleted!",
         icon: 'warning',
         showCancelButton: true,
@@ -220,9 +265,13 @@ function deleteConfirm(url) {
     });
 }
 
-function bulkDeleteConfirm(event, form) {
-    event.preventDefault();
 
+/*
+|--------------------------------------------------------------------------
+| Bulk Delete
+|--------------------------------------------------------------------------
+*/
+function bulkDeleteConfirm() {
     let checked = document.querySelectorAll(
         'input[name="ids[]"]:checked'
     );
@@ -231,13 +280,13 @@ function bulkDeleteConfirm(event, form) {
         Swal.fire({
             icon: 'warning',
             title: 'No Selection',
-            text: 'Please select at least one record.'
+            text: 'Please select at least one fee assignment.'
         });
         return;
     }
 
     Swal.fire({
-        title: 'Delete Selected?',
+        title: 'Delete selected fee assignments?',
         text: "Selected fee assignments will be deleted!",
         icon: 'warning',
         showCancelButton: true,
@@ -247,19 +296,10 @@ function bulkDeleteConfirm(event, form) {
         cancelButtonText: 'Cancel'
     }).then((result) => {
         if (result.isConfirmed) {
-            form.submit();
+            document.getElementById('bulkForm').submit();
         }
     });
 }
-
-document.getElementById('select-all').addEventListener('click', function () {
-    let checkboxes = document.querySelectorAll(
-        'input[name="ids[]"]'
-    );
-
-    checkboxes.forEach((checkbox) => {
-        checkbox.checked = this.checked;
-    });
-});
 </script>
+
 @stop
