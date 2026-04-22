@@ -402,6 +402,35 @@ return [
 
         ],
     ], 
+	    // ======================
+    // Fee Payment
+    // ======================
+	
+	[
+		'text' => 'Fees Management',
+		'icon' => 'fas fa-money-check-alt',
+		'submenu' => [
+
+			[
+				'text' => 'Fee Types',
+				'url'  => 'fee-types',
+				'icon' => 'fas fa-tags',
+			],
+
+			[
+				'text' => 'Student Fee Assignment',
+				'url'  => 'student-fees',
+				'icon' => 'fas fa-user-plus',
+			],
+
+			[
+				'text' => 'Fee Collection',
+				'url'  => 'fee-payments',
+				'icon' => 'fas fa-wallet',
+			],
+
+		],
+	],
 
     // ======================
     // ACCOUNT
@@ -422,7 +451,11 @@ return [
 
  
 
-    // ======================
+
+	
+	
+	
+	// ======================
     // SETTINGS
     // ======================
     ['header' => 'SETTINGS'],

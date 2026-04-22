@@ -14,6 +14,9 @@ use App\Http\Controllers\Admin\ClassSubjectController;
 use App\Http\Controllers\Admin\TimetableController;
 use App\Http\Controllers\Admin\TimeSlotController;
 use App\Http\Controllers\Admin\AttendanceController;
+use App\Http\Controllers\Admin\FeeTypeController;
+use App\Http\Controllers\Admin\StudentFeeController;
+use App\Http\Controllers\Admin\FeePaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,12 +58,15 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 			->get()
 			->map(function ($student) {
 				return [
-					'id' => $student->user->id,
+					'id' => $student->id,
 					'name' => $student->user->name
 				];
 			});
 
 	});
+	
+	Route::get('/get-attendance/{class}/{section}/{date}', [AttendanceController::class, 'getStudents']);
+	Route::get('/get-student-fees/{student_id}', [FeePaymentController::class,'getStudentFees']);
 
 
     /*
@@ -230,7 +236,65 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 		Route::post('/store', 'store');
 		Route::get('/report', 'report');
 	});
-	Route::get('/get-attendance/{class}/{section}/{date}', [AttendanceController::class, 'getStudents']);
+	
+	/*
+    |--------------------------------------------------------------------------
+    | Fee Types
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('fee-types')->controller(FeeTypeController::class)->group(function () {
+
+			Route::get('/', 'index');
+			Route::get('/create', 'create');
+			Route::post('/store', 'store');
+
+			Route::get('/edit/{id}', 'edit');
+			Route::post('/update/{id}', 'update');
+
+			Route::delete('/delete/{id}', 'destroy');
+			Route::post('/bulk-delete', 'bulkDelete');
+
+	});	
+	
+	/*
+    |--------------------------------------------------------------------------
+    | Fee Types
+    |--------------------------------------------------------------------------
+    */
+    
+
+	Route::prefix('student-fees')->controller(StudentFeeController::class)->group(function () {
+
+			Route::get('/', 'index');
+			Route::get('/create', 'create');
+			Route::post('/store', 'store');
+
+			Route::get('/edit/{id}', 'edit');
+			Route::post('/update/{id}', 'update');
+
+			Route::delete('/delete/{id}', 'destroy');
+			Route::post('/bulk-delete', 'bulkDelete');
+
+	});	
+	/*
+    |--------------------------------------------------------------------------
+    | Fee Payments
+    |--------------------------------------------------------------------------
+    */
+	Route::prefix('fee-payments')->controller(FeePaymentController::class)->group(function () {
+
+			Route::get('/', 'index');
+			Route::get('/create', 'create');
+			Route::post('/store', 'store');
+
+			Route::get('/edit/{id}', 'edit');
+			Route::post('/update/{id}', 'update');
+
+			Route::delete('/delete/{id}', 'destroy');
+			Route::post('/bulk-delete', 'bulkDelete');
+
+		});
+	
 	
 
 });

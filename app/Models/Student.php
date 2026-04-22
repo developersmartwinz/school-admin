@@ -42,4 +42,12 @@ class Student extends Model
 	{
 		return $this->belongsTo(Section::class);
 	}
+	public function fees()
+	{
+		return $this->hasMany(StudentFee::class);
+	}
+	public function feePayments()
+	{
+		return $this->hasMany(FeePayment::class);
+	}
 }
