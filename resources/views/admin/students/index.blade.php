@@ -14,8 +14,8 @@
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Student List</h5>
 
-        <div class="d-flex gap-2" data-aos="flip-left">
-            <a href="/students/create" class="btn btn-success">
+        <div class="d-flex" data-aos="flip-left">
+            <a href="/students/create" class="btn btn-success mr-2">
                 <i class="fas fa-plus"></i> Add
             </a>
 

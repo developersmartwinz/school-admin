@@ -1,23 +1,22 @@
 @extends('adminlte::page')
 
-@section('title', 'Fee Types')
+@section('title', 'Notice Board')
 
 @section('content_header')
-    <h1>Fee Types</h1>
+    <h1>Notice Board</h1>
 @stop
 
 @section('content')
 
 <div class="card shadow-sm">
 
-    {{-- HEADER --}}
+    {{-- Header --}}
     <div class="card-header d-flex justify-content-between align-items-center">
-
-        <h5 class="mb-0">Fee Type List</h5>
+        <h5 class="mb-0">Notice List</h5>
 
         <div class="d-flex">
-            <a href="/fee-types/create" class="btn btn-success mr-2">
-                <i class="fas fa-plus"></i> Add Fee Type
+            <a href="/notices/create" class="btn btn-success mr-2">
+                <i class="fas fa-plus"></i> Add Notice
             </a>
 
             <button
@@ -28,62 +27,93 @@
                 <i class="fas fa-trash"></i> Delete Selected
             </button>
         </div>
-
     </div>
 
-    {{-- BODY --}}
+    {{-- Body --}}
     <div class="card-body">
 
-        {{-- Search --}}
-        <form
-            method="GET"
-            action="/fee-types"
-            class="mb-3 d-flex gap-2"
-        >
-            <input
-                type="text"
-                name="search"
-                value="{{ request('search') }}"
-                class="form-control"
-                placeholder="Search fee type name"
-            >
+        {{-- Filters --}}
+        <form method="GET" action="/notices" class="mb-4">
+            <div class="row">
 
-            <button class="btn btn-primary">
-                <i class="fas fa-search"></i>
-            </button>
+                <div class="col-md-4">
+                    <input
+                        type="text"
+                        name="search"
+                        class="form-control"
+                        placeholder="Search title / description / sender..."
+                        value="{{ request('search') }}"
+                    >
+                </div>
 
-            <a href="/fee-types" class="btn btn-secondary">
-                Reset
-            </a>
+                <div class="col-md-2">
+                    <select name="status" class="form-control">
+                        <option value="">All Status</option>
+
+                        <option
+                            value="active"
+                            {{ request('status') == 'active' ? 'selected' : '' }}
+                        >
+                            Active
+                        </option>
+
+                        <option
+                            value="inactive"
+                            {{ request('status') == 'inactive' ? 'selected' : '' }}
+                        >
+                            Inactive
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <button class="btn btn-info w-100">
+                        <i class="fas fa-search"></i> Filter
+                    </button>
+                </div>
+
+                <div class="col-md-2">
+                    <a
+                        href="/notices"
+                        class="btn btn-secondary w-100"
+                    >
+                        Reset
+                    </a>
+                </div>
+
+            </div>
         </form>
 
         {{-- Bulk Delete Form --}}
         <form
             method="POST"
-            action="/fee-types/bulk-delete"
+            action="/notices/bulk-delete"
             id="bulkForm"
         >
             @csrf
 
             <div class="table-responsive">
-                <table class="table table-bordered table-hover text-center align-middle">
+                <table class="table table-bordered table-hover">
 
-                    <thead class="bg-dark text-white">
+                    <thead>
                         <tr>
                             <th width="50">
                                 <input type="checkbox" id="selectAll">
                             </th>
                             <th>#</th>
-                            <th>Fee Type Name</th>
-                            <th>Default Amount</th>
-                            <th>Description</th>
-                            <th width="150">Action</th>
+                            <th>Title</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Sent By</th>
+                            <th>Attachment</th>
+                            <th>Status</th>
+                            <th width="180">Action</th>
                         </tr>
                     </thead>
 
                     <tbody>
 
-                        @forelse($feeTypes as $row)
+                        @forelse($notices as $row)
                             <tr>
 
                                 <td>
@@ -95,26 +125,56 @@
                                 </td>
 
                                 <td>
-                                    {{ ($feeTypes->currentPage() - 1) * $feeTypes->perPage() + $loop->iteration }}
+                                    {{ ($notices->currentPage() - 1) * $notices->perPage() + $loop->iteration }}
                                 </td>
 
                                 <td>
-                                    <strong>{{ $row->name }}</strong>
+                                    <strong>{{ $row->title }}</strong>
                                 </td>
 
                                 <td>
-                                    ₹ {{ number_format($row->amount, 2) }}
+                                    {{ \Carbon\Carbon::parse($row->notice_date)->format('d M Y') }}
                                 </td>
 
                                 <td>
-                                    {{ $row->description ?? '-' }}
+                                    {{ $row->notice_time ?? '-' }}
+                                </td>
+
+                                <td>
+                                    {{ $row->sent_by ?? '-' }}
+                                </td>
+
+                                <td>
+                                    @if($row->attachment)
+                                        <a
+                                            href="{{ asset('uploads/notices/' . $row->attachment) }}"
+                                            target="_blank"
+                                            class="btn btn-sm btn-info"
+                                        >
+                                            View File
+                                        </a>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+
+                                <td>
+                                    @if($row->status == 'active')
+                                        <span class="badge badge-success">
+                                            Active
+                                        </span>
+                                    @else
+                                        <span class="badge badge-secondary">
+                                            Inactive
+                                        </span>
+                                    @endif
                                 </td>
 
                                 <td>
                                     <div class="btn-group">
 
                                         <a
-                                            href="/fee-types/edit/{{ $row->id }}"
+                                            href="/notices/edit/{{ $row->id }}"
                                             class="btn btn-sm btn-outline-primary"
                                         >
                                             <i class="fas fa-edit"></i>
@@ -123,7 +183,7 @@
                                         <button
                                             type="button"
                                             class="btn btn-sm btn-outline-danger"
-                                            onclick="deleteConfirm('/fee-types/delete/{{ $row->id }}')"
+                                            onclick="deleteConfirm('/notices/delete/{{ $row->id }}')"
                                         >
                                             <i class="fas fa-trash"></i>
                                         </button>
@@ -134,8 +194,8 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center">
-                                    No fee types found
+                                <td colspan="9" class="text-center">
+                                    No notices found.
                                 </td>
                             </tr>
                         @endforelse
@@ -149,10 +209,10 @@
 
         {{-- Pagination --}}
         <div class="mt-3">
-            {{ $feeTypes->appends(request()->query())->links() }}
+            {{ $notices->appends(request()->query())->links() }}
         </div>
 
-        {{-- Hidden Delete Form --}}
+        {{-- Hidden Single Delete Form --}}
         <form
             id="delete-form"
             method="POST"
@@ -163,10 +223,10 @@
         </form>
 
     </div>
-
 </div>
 
 @stop
+
 
 @section('js')
 
@@ -175,7 +235,7 @@
 <script>
 /*
 |--------------------------------------------------------------------------
-| Select All
+| Select All Checkbox
 |--------------------------------------------------------------------------
 */
 document.getElementById('selectAll').addEventListener('click', function () {
@@ -196,8 +256,8 @@ document.getElementById('selectAll').addEventListener('click', function () {
 */
 function deleteConfirm(url) {
     Swal.fire({
-        title: 'Delete fee type?',
-        text: "This fee type will be deleted!",
+        title: 'Delete notice?',
+        text: "This notice will be deleted!",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
@@ -228,14 +288,14 @@ function bulkDeleteConfirm() {
         Swal.fire({
             icon: 'warning',
             title: 'No Selection',
-            text: 'Please select at least one fee type.'
+            text: 'Please select at least one notice.'
         });
         return;
     }
 
     Swal.fire({
-        title: 'Delete selected fee types?',
-        text: "Selected fee types will be deleted!",
+        title: 'Delete selected notices?',
+        text: "Selected notices will be deleted!",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',

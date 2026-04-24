@@ -14,8 +14,8 @@
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Payment History</h5>
 
-        <div class="d-flex gap-2">
-            <a href="/fee-payments/create" class="btn btn-primary">
+        <div class="d-flex">
+            <a href="/fee-payments/create" class="btn btn-primary mr-2">
                 <i class="fas fa-plus"></i> Collect Fee
             </a>
 

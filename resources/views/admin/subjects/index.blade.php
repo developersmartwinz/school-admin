@@ -14,8 +14,8 @@
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Subject List</h5>
 
-        <div class="d-flex gap-2" data-aos="flip-left">
-            <a href="/subjects/create" class="btn btn-success">
+        <div class="d-flex" data-aos="flip-left">
+            <a href="/subjects/create" class="btn btn-success mr-2">
                 <i class="fas fa-plus"></i> Add
             </a>
 
@@ -71,7 +71,7 @@
                             </th>
                             <th>ID</th>
                             <th>Subject Name</th>
-                            <th>Class</th>
+                            
                             <th width="150">Actions</th>
                         </tr>
                     </thead>
@@ -94,9 +94,7 @@
                                     {{ $subject->name ?? '' }}
                                 </td>
 
-                                <td>
-                                    {{ $subject->class->name ?? '' }}
-                                </td>
+                               
 
                                 <td>
                                     <div class="btn-group">

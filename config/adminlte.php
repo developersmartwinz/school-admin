@@ -431,6 +431,68 @@ return [
 
 		],
 	],
+	
+
+
+	//
+	// ======================
+	// COMMUNICATION
+	// ======================
+	//
+
+	[
+		'text' => 'Communication',
+		'icon' => 'fas fa-bullhorn',
+		'submenu' => [
+
+			[
+				'text' => 'Notice Board',
+				'url'  => 'notices',
+				'icon' => 'fas fa-bullhorn',
+			],
+
+		],
+	],
+
+	//
+	// ======================
+	// MEDIA MANAGEMENT
+	// ======================
+	//
+
+	[
+		'text' => 'Media Management',
+		'icon' => 'fas fa-images',
+		'submenu' => [
+
+			[
+				'text' => 'Gallery',
+				'url'  => 'galleries',
+				'icon' => 'fas fa-images',
+			],
+
+		],
+	],
+
+	//
+	// ======================
+	// HOMEWORK MANAGEMENT
+	// ======================
+	//
+
+	[
+		'text' => 'Homework Management',
+		'icon' => 'fas fa-tasks',
+		'submenu' => [
+
+			[
+				'text' => 'Homework / Assignment',
+				'url'  => 'homeworks',
+				'icon' => 'fas fa-book-reader',
+			],
+
+		],
+	],
 
     // ======================
     // ACCOUNT

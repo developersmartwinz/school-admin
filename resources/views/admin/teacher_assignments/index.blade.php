@@ -14,8 +14,8 @@
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Assignments List</h5>
 
-        <div class="d-flex gap-2">
-            <a href="/teacher-assignments/create" class="btn btn-success">
+        <div class="d-flex">
+            <a href="/teacher-assignments/create" class="btn btn-success mr-2">
                 <i class="fas fa-plus"></i> Add
             </a>
 

@@ -15,8 +15,8 @@
 
         <h5 class="mb-0">Time Slot List</h5>
 
-        <div class="d-flex gap-2">
-            <a href="/time-slots/create" class="btn btn-success">
+        <div class="d-flex">
+            <a href="/time-slots/create" class="btn btn-success mr-2">
                 <i class="fas fa-plus"></i> Add Slot
             </a>
 
